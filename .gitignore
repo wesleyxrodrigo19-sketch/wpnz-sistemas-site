@@ -1,3 +1,6 @@
 .wrangler/
 .DS_Store
 Thumbs.db
+marketing-videos/_text/
+marketing-videos/_review/
+tools/__pycache__/

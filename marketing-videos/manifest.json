@@ -1,0 +1,19 @@
+{
+  "format": "MP4 H.264/AAC",
+  "dimensions": "1080x1920",
+  "aspect_ratio": "9:16",
+  "fps": 30,
+  "duration_seconds": 38,
+  "audio": "trilha instrumental original",
+  "files": [
+    "01-acaiteria-vertical-38s.mp4",
+    "02-bar-restaurante-vertical-38s.mp4",
+    "03-hamburgueria-vertical-38s.mp4",
+    "04-pizzaria-vertical-38s.mp4",
+    "05-marmitaria-vertical-38s.mp4",
+    "06-espetaria-vertical-38s.mp4",
+    "07-cafeteria-vertical-38s.mp4",
+    "08-sushi-vertical-38s.mp4",
+    "09-wpnz-completo-vertical-38s.mp4"
+  ]
+}
