@@ -4,3 +4,8 @@ Thumbs.db
 marketing-videos/_text/
 marketing-videos/_review/
 tools/__pycache__/
+marketing-videos/professional/_frames/
+marketing-videos/professional/_review/
+marketing-videos/professional/_package/
+tools/browser-profile*/
+tools/chrome-profile*/

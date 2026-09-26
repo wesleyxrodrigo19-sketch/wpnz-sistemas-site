@@ -22,6 +22,20 @@
 8. Sushi e culinária oriental
 9. Wpnz completo — resumo de nichos e recursos
 
+## Conteúdo demonstrado
+
+As peças não são apresentações de texto. Cada vídeo inclui telas simuladas do produto e uma pequena jornada operacional:
+
+- cardápio digital e visão da operação;
+- lançamento de produtos e fechamento do pedido no PDV;
+- envio automático para produção e exemplo de comanda impressa;
+- recurso específico do nicho, como balança, mesas, garçons, sabores, rotas ou agenda;
+- dashboard de vendas, canais, produção e caixa;
+- configuração de identidade visual, módulos e regras sob medida;
+- oferta final com planos, indicação e contato.
+
+Todos os estabelecimentos, pedidos, números, produtos e identidades exibidos são fictícios e servem exclusivamente como demonstração comercial.
+
 ## Encerramento padronizado
 
 Todos os vídeos terminam com:
