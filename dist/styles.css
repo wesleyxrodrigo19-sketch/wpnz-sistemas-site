@@ -242,6 +242,41 @@ button, input { font: inherit; }
 .tech-ribbon { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 18px; margin-top: 80px; padding: 26px 0 0; border-top: 1px solid rgba(255,255,255,.1); color: rgba(255,255,255,.62); font-size: 14px; }
 .tech-ribbon i { width: 4px; height: 4px; border-radius: 50%; background: var(--aqua); }
 
+.pricing { padding: 120px 0; background: linear-gradient(180deg, #f3f7f3, #fff); }
+.pricing-heading { max-width: 820px; margin: 0 auto 50px; text-align: center; }
+.pricing-heading h2 { margin: 15px 0 16px; font: 800 clamp(2.3rem, 4.2vw, 4rem)/1.06 "Manrope", sans-serif; letter-spacing: -.055em; }
+.pricing-heading p { margin: 0; color: var(--muted); font-size: 18px; }
+.pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; max-width: 1000px; margin: 0 auto; }
+.price-card { position: relative; display: flex; flex-direction: column; min-height: 555px; padding: 34px; border: 1px solid var(--line); border-radius: 26px; background: #fff; box-shadow: 0 20px 60px rgba(7,35,36,.07); }
+.price-card.featured-price { color: #fff; border-color: #173d3d; background: linear-gradient(145deg, #07191b, #103b3b); box-shadow: 0 28px 80px rgba(4,28,29,.2); }
+.popular-label { position: absolute; right: 24px; top: 24px; padding: 7px 10px; border-radius: 999px; color: var(--ink); background: var(--lime); font-size: 11px; font-weight: 900; letter-spacing: .08em; }
+.price-top { display: grid; padding-bottom: 25px; border-bottom: 1px solid var(--line); }
+.featured-price .price-top { border-color: rgba(255,255,255,.13); }
+.price-top > span { color: #178f88; font-size: 13px; font-weight: 900; letter-spacing: .11em; }
+.featured-price .price-top > span { color: var(--aqua); }
+.price-top strong { margin-top: 16px; font: 800 54px/1 "Manrope", sans-serif; letter-spacing: -.06em; }
+.price-top strong small { font-size: 16px; letter-spacing: 0; }
+.price-card > p { color: var(--muted); font-size: 16px; }
+.featured-price > p { color: rgba(255,255,255,.66); }
+.price-card ul { display: grid; gap: 12px; margin: 15px 0 30px; padding: 0; list-style: none; }
+.price-card li { position: relative; padding-left: 27px; color: #405354; font-size: 15px; }
+.price-card li::before { content: "✓"; position: absolute; left: 0; color: #139b8e; font-weight: 900; }
+.featured-price li { color: rgba(255,255,255,.78); }
+.featured-price li::before { color: var(--lime); }
+.price-button { min-height: 52px; display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: auto; border-radius: 12px; color: #fff; background: var(--ink); font-weight: 900; text-decoration: none; }
+.price-button.light { color: var(--ink); background: var(--lime); }
+.referral-card { max-width: 1000px; display: grid; grid-template-columns: 110px 1fr 1.1fr; align-items: center; gap: 28px; margin: 20px auto 0; padding: 28px; border: 1px solid #cfe4de; border-radius: 24px; background: #eaf8f3; }
+.referral-badge { width: 98px; height: 98px; display: grid; place-items: center; border-radius: 25px; color: var(--ink); background: var(--lime); font: 900 30px/1 "Manrope", sans-serif; transform: rotate(-4deg); }
+.referral-card > div:nth-child(2) > span { color: #168e86; font-size: 12px; font-weight: 900; letter-spacing: .11em; }
+.referral-card h3 { margin: 7px 0; font: 800 23px/1.2 "Manrope", sans-serif; letter-spacing: -.035em; }
+.referral-card p { margin: 0; color: var(--muted); font-size: 15px; }
+.discount-steps { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; }
+.discount-steps span { display: grid; place-items: center; padding: 10px 5px; border-radius: 10px; color: #54706d; background: rgba(255,255,255,.72); font-size: 10px; text-align: center; }
+.discount-steps b { color: var(--ink); font-size: 16px; }
+.discount-steps span:last-child { color: #fff; background: var(--ink); }
+.discount-steps span:last-child b { color: var(--lime); }
+.pricing-note { max-width: 1000px; margin: 16px auto 0; color: #71807f; font-size: 13px; text-align: center; }
+
 .faq { padding: 120px 0; background: #fff; }
 .faq-grid { display: grid; grid-template-columns: .8fr 1.2fr; align-items: start; gap: 100px; }
 .faq-title { position: sticky; top: 30px; }
@@ -334,7 +369,7 @@ button, input { font: inherit; }
   .orbit-b { display: none; }
   .trust-strip { justify-content: flex-start; margin-top: 20px; }
   .trust-strip > span { width: 100%; }
-  .pain-section, .solutions, .projects, .faq { padding: 88px 0; }
+  .pain-section, .solutions, .projects, .pricing, .faq { padding: 88px 0; }
   .section-intro h2, .section-heading h2, .workflow-copy h2, .integration-copy h2, .faq-title h2 { font-size: 2.3rem; }
   .pain-grid, .feature-grid { grid-template-columns: 1fr; }
   .feature.featured { grid-column: auto; }
@@ -342,6 +377,10 @@ button, input { font: inherit; }
   .feature { min-height: 220px; }
   .workflow-section, .integrations { padding: 88px 0; }
   .workflow-grid, .integrations-grid, .faq-grid { grid-template-columns: 1fr; gap: 45px; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .price-card { min-height: 0; }
+  .referral-card { grid-template-columns: 1fr; }
+  .discount-steps { grid-template-columns: repeat(5,1fr); }
   .project-track { grid-auto-columns: 88%; }
   .project-visual { height: 280px; }
   .niche-logo { width: 96px; height: 96px; right: 12px; bottom: 17px; }
@@ -359,6 +398,15 @@ button, input { font: inherit; }
   .footer-bottom { flex-direction: column; }
   .whatsapp-float { right: 14px; bottom: 72px; padding-left: 12px; }
   .whatsapp-float span { font-size: 13px; }
+}
+
+@media (max-width: 520px) {
+  .price-card { padding: 27px 22px; }
+  .price-top strong { font-size: 46px; }
+  .popular-label { position: static; justify-self: start; margin-bottom: 18px; }
+  .referral-card { padding: 24px 20px; }
+  .discount-steps { grid-template-columns: 1fr 1fr; }
+  .discount-steps span:last-child { grid-column: span 2; }
 }
 
 @media (prefers-reduced-motion: reduce) {
