@@ -222,6 +222,13 @@ button, input { font: inherit; }
 .project-content a, .project-label { display: inline-flex; gap: 10px; color: var(--ink); font-size: 15px; font-weight: 800; text-decoration: none; }
 .project-content a:hover { color: #0b9289; }
 .project-label { color: #647273; }
+.project-demo-links { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: auto; padding-top: 4px; }
+.project-demo-links a { display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 11px; color: var(--ink); background: #fff; font-size: 13px; text-align: center; transition: .2s; }
+.project-demo-links a:first-child { color: #fff; border-color: var(--ink); background: var(--ink); }
+.project-demo-links a:hover { color: var(--ink); border-color: var(--teal); transform: translateY(-2px); }
+.project-demo-links a:first-child:hover { color: #fff; background: #0b3a3b; }
+.project-fatiado .project-visual { background: linear-gradient(145deg, #fff1f2, #ffe4e6); }
+.niche-fatiado { border-radius: 18px; background-image: url("assets/catalogo-segmentos-3x3.png"); background-position: 100% 100%; background-size: 300% 300%; }
 
 .integrations { padding: 120px 0 44px; color: #fff; background: linear-gradient(135deg, #071516, #0b2d2e); }
 .integrations-grid { display: grid; grid-template-columns: .95fr 1.05fr; gap: 90px; align-items: start; }
@@ -407,6 +414,7 @@ button, input { font: inherit; }
   .referral-card { padding: 24px 20px; }
   .discount-steps { grid-template-columns: 1fr 1fr; }
   .discount-steps span:last-child { grid-column: span 2; }
+  .project-demo-links { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
