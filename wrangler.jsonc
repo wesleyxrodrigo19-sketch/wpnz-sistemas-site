@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "wpnz-sistemas-site",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-18",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "wpnz-admin-db",
+      "database_id": "6167aaa8-59c8-4bd2-aa79-5b7f94fc6160"
+    }
+  ]
+}
