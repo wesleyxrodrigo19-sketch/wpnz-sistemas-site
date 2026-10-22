@@ -51,6 +51,48 @@ async function ensureDatabase(db) {
   }
 }
 
+// Mantém ao menos 12 meses de vencimentos futuros para cada sistema ativo.
+// Datas são ancoradas no dia da primeira mensalidade; meses curtos usam o último dia.
+function addMonthsClamped(anchor, offset) {
+  const [year, month, day] = anchor.split("-").map(Number);
+  const target = new Date(Date.UTC(year, month - 1 + offset, 1));
+  const lastDay = new Date(Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0)).getUTCDate();
+  return `${target.getUTCFullYear()}-${String(target.getUTCMonth() + 1).padStart(2, "0")}-${String(Math.min(day, lastDay)).padStart(2, "0")}`;
+}
+
+async function ensureUpcomingPayments(db) {
+  const today = new Date().toISOString().slice(0, 10);
+  const [todayYear, todayMonth] = today.split("-").map(Number);
+  const horizonDate = addMonthsClamped(today, 12);
+  const systems = await db.prepare(
+    "SELECT id, first_due_date, monthly_fee_cents FROM systems WHERE status='active' AND first_due_date IS NOT NULL AND monthly_fee_cents > 0"
+  ).all();
+  const inserts = [];
+  for (const system of systems.results || []) {
+    const anchor = /^\\d{4}-\\d{2}-\\d{2}$/.test(system.first_due_date) ? system.first_due_date : null;
+    if (!anchor) continue;
+    const [anchorYear, anchorMonth] = anchor.split("-").map(Number);
+    let offset = Math.max(0, (todayYear - anchorYear) * 12 + todayMonth - anchorMonth);
+    const payments = await db.prepare(
+      "SELECT reference_month FROM payments WHERE system_id=? AND reference_month>=? AND reference_month<=?"
+    ).bind(system.id, today.slice(0, 7), horizonDate.slice(0, 7)).all();
+    const existing = new Set((payments.results || []).map(payment => payment.reference_month));
+    for (let dueDate = addMonthsClamped(anchor, offset); dueDate <= horizonDate; dueDate = addMonthsClamped(anchor, ++offset)) {
+      if (dueDate < today) continue;
+      const referenceMonth = dueDate.slice(0, 7);
+      if (!existing.has(referenceMonth)) {
+        inserts.push(db.prepare(
+          "INSERT OR IGNORE INTO payments (system_id,reference_month,due_date,amount_cents,status,notes) VALUES (?,?,?,?, 'open', 'Mensalidade gerada automaticamente')"
+        ).bind(system.id, referenceMonth, dueDate, system.monthly_fee_cents));
+        existing.add(referenceMonth);
+      }
+    }
+  }
+  for (let index = 0; index < inserts.length; index += 80) {
+    await db.batch(inserts.slice(index, index + 80));
+  }
+}
+
 function cleanSystem(body) {
   const cents = value => value === "" || value == null ? null : Math.round(Number(value) * 100);
   return {
@@ -79,6 +121,7 @@ async function handleApi(request, env, url) {
   }
   if (!(await isAuthorized(request, env.ADMIN_PASSWORD))) return json({ error: "Sessão não autorizada." }, 401);
   await ensureDatabase(env.DB);
+  await ensureUpcomingPayments(env.DB);
   if (url.pathname === "/api/admin/session") return json({ authenticated: true });
   if (url.pathname === "/api/admin/overview") {
     const systems = await env.DB.prepare(`SELECT s.*, (s.monthly_fee_cents-s.monthly_cost_cents) AS monthly_profit_cents, CASE WHEN s.project_cost_cents IS NOT NULL AND (s.monthly_fee_cents-s.monthly_cost_cents)>0 THEN ROUND(CAST(s.project_cost_cents AS REAL)/(s.monthly_fee_cents-s.monthly_cost_cents),1) END AS payback_months, (SELECT COUNT(*) FROM payments p WHERE p.system_id=s.id AND p.status='open') AS open_payments, (SELECT MIN(due_date) FROM payments p WHERE p.system_id=s.id AND p.status='open') AS next_open_due FROM systems s ORDER BY s.status='active' DESC,s.business_name`).all();
