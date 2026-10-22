@@ -69,7 +69,7 @@ async function ensureUpcomingPayments(db) {
   ).all();
   const inserts = [];
   for (const system of systems.results || []) {
-    const anchor = /^\\d{4}-\\d{2}-\\d{2}$/.test(system.first_due_date) ? system.first_due_date : null;
+    const anchor = /^\d{4}-\d{2}-\d{2}$/.test(system.first_due_date) ? system.first_due_date : null;
     if (!anchor) continue;
     const [anchorYear, anchorMonth] = anchor.split("-").map(Number);
     let offset = Math.max(0, (todayYear - anchorYear) * 12 + todayMonth - anchorMonth);
