@@ -65,7 +65,7 @@ async function ensureUpcomingPayments(db) {
   const [todayYear, todayMonth] = today.split("-").map(Number);
   const horizonDate = addMonthsClamped(today, 12);
   const systems = await db.prepare(
-    "SELECT id, first_due_date, monthly_fee_cents FROM systems WHERE status='active' AND first_due_date IS NOT NULL AND monthly_fee_cents > 0"
+    "SELECT s.id, COALESCE(s.first_due_date,(SELECT MIN(p0.due_date) FROM payments p0 WHERE p0.system_id=s.id AND p0.status!='deleted')) AS first_due_date, s.monthly_fee_cents FROM systems s WHERE s.status='active' AND s.monthly_fee_cents > 0"
   ).all();
   const inserts = [];
   for (const system of systems.results || []) {
@@ -125,7 +125,7 @@ async function handleApi(request, env, url) {
   if (url.pathname === "/api/admin/session") return json({ authenticated: true });
   if (url.pathname === "/api/admin/overview") {
     const systems = await env.DB.prepare(`SELECT s.*, (s.monthly_fee_cents-s.monthly_cost_cents) AS monthly_profit_cents, CASE WHEN s.project_cost_cents IS NOT NULL AND (s.monthly_fee_cents-s.monthly_cost_cents)>0 THEN ROUND(CAST(s.project_cost_cents AS REAL)/(s.monthly_fee_cents-s.monthly_cost_cents),1) END AS payback_months, (SELECT COUNT(*) FROM payments p WHERE p.system_id=s.id AND p.status='open') AS open_payments, (SELECT MIN(due_date) FROM payments p WHERE p.system_id=s.id AND p.status='open') AS next_open_due FROM systems s ORDER BY s.status='active' DESC,s.business_name`).all();
-    const payments = await env.DB.prepare(`SELECT p.*,s.business_name FROM payments p JOIN systems s ON s.id=p.system_id ORDER BY p.due_date DESC,p.id DESC`).all();
+    const payments = await env.DB.prepare(`SELECT p.*,s.business_name FROM payments p JOIN systems s ON s.id=p.system_id WHERE p.status!='deleted' ORDER BY p.due_date DESC,p.id DESC`).all();
     return json({ systems: systems.results, payments: payments.results });
   }
   if (url.pathname === "/api/admin/systems" && request.method === "POST") {
@@ -149,7 +149,16 @@ async function handleApi(request, env, url) {
   const paymentMatch = url.pathname.match(/^\/api\/admin\/payments\/(\d+)$/);
   if (paymentMatch && request.method === "PUT") {
     const b = await request.json();
-    await env.DB.prepare(`UPDATE payments SET status=?,paid_at=?,payment_method=?,notes=?,updated_at=CURRENT_TIMESTAMP WHERE id=?`).bind(b.status,b.status === "paid" ? (b.paid_at || new Date().toISOString().slice(0,10)) : null,b.payment_method || null,b.notes || null,Number(paymentMatch[1])).run();
+    const amount = Math.round(Number(b.amount) * 100);
+    const status = ["open","paid","waived"].includes(b.status) ? b.status : "open";
+    if (!/^\\d{4}-\\d{2}$/.test(String(b.reference_month || "")) || !/^\\d{4}-\\d{2}-\\d{2}$/.test(String(b.due_date || "")) || !Number.isFinite(amount) || amount < 0) {
+      return json({ error: "Confira a referência, o vencimento e o valor." }, 400);
+    }
+    await env.DB.prepare(`UPDATE payments SET system_id=?,reference_month=?,due_date=?,amount_cents=?,status=?,paid_at=?,payment_method=?,notes=?,updated_at=CURRENT_TIMESTAMP WHERE id=? AND status!='deleted'`).bind(Number(b.system_id),b.reference_month,b.due_date,amount,status,status === "paid" ? (b.paid_at || new Date().toISOString().slice(0,10)) : null,b.payment_method || null,b.notes || null,Number(paymentMatch[1])).run();
+    return json({ ok: true });
+  }
+  if (paymentMatch && request.method === "DELETE") {
+    await env.DB.prepare(`UPDATE payments SET status='deleted',updated_at=CURRENT_TIMESTAMP WHERE id=? AND status!='deleted'`).bind(Number(paymentMatch[1])).run();
     return json({ ok: true });
   }
   return json({ error: "Rota não encontrada." }, 404);
