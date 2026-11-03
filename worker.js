@@ -147,11 +147,18 @@ async function handleApi(request, env, url) {
     return json({ ok: true }, 201);
   }
   const paymentMatch = url.pathname.match(/^\/api\/admin\/payments\/(\d+)$/);
+  if (paymentMatch && request.method === "PATCH") {
+    const b = await request.json().catch(() => ({}));
+    if (!["open","paid","waived"].includes(b.status)) return json({ error: "Status de pagamento inválido." }, 400);
+    await env.DB.prepare(`UPDATE payments SET status=?,paid_at=?,updated_at=CURRENT_TIMESTAMP WHERE id=? AND status!='deleted'`)
+      .bind(b.status,b.status === "paid" ? (b.paid_at || new Date().toISOString().slice(0,10)) : null,Number(paymentMatch[1])).run();
+    return json({ ok: true });
+  }
   if (paymentMatch && request.method === "PUT") {
     const b = await request.json();
     const amount = Math.round(Number(b.amount) * 100);
     const status = ["open","paid","waived"].includes(b.status) ? b.status : "open";
-    if (!/^\\d{4}-\\d{2}$/.test(String(b.reference_month || "")) || !/^\\d{4}-\\d{2}-\\d{2}$/.test(String(b.due_date || "")) || !Number.isFinite(amount) || amount < 0) {
+    if (!/^\d{4}-\d{2}$/.test(String(b.reference_month || "")) || !/^\d{4}-\d{2}-\d{2}$/.test(String(b.due_date || "")) || !Number.isFinite(amount) || amount < 0) {
       return json({ error: "Confira a referência, o vencimento e o valor." }, 400);
     }
     await env.DB.prepare(`UPDATE payments SET system_id=?,reference_month=?,due_date=?,amount_cents=?,status=?,paid_at=?,payment_method=?,notes=?,updated_at=CURRENT_TIMESTAMP WHERE id=? AND status!='deleted'`).bind(Number(b.system_id),b.reference_month,b.due_date,amount,status,status === "paid" ? (b.paid_at || new Date().toISOString().slice(0,10)) : null,b.payment_method || null,b.notes || null,Number(paymentMatch[1])).run();
